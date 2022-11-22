@@ -35,10 +35,8 @@ class OperacoesTesouroDireto(Resource):
 class GetTesouro(Resource):
     @cross_origin()
     def get(self):
-        # argumentos = reqparse.RequestParser()
-        # argumentos.add_argument('tesouro_type', required=True, help='Treasury type cannot be blank')
-        # args = argumentos.parse_args()
         tesouro_type = request.args.get('tesouro_type')
+        data_vencimento = request.args.get('data_vencimento')
         
         if tesouro_type == "1":
             argumento = "Tesouro IGPM+ com Juros Semestrais"
@@ -54,13 +52,15 @@ class GetTesouro(Resource):
             argumento = "Tesouro Prefixado"
         else: 
             argumento = "Tesouro Selic"
-        print(tesouro_type, argumento)
 
         URI = "mongodb://localhost:27017/"
         client = MongoClient(URI)
         db = client["tfg-database"]
-        collection = db["tesouros"]
-        dados = collection.find({"Tipo Titulo" : argumento })
+        collection = db["vendaTesouros"]
+        if(data_vencimento):
+            dados = collection.find({"Tipo Titulo" : argumento, "Vencimento do Titulo": data_vencimento })
+        else:
+             dados = collection.find({"Tipo Titulo" : argumento})
         result = []
         for data in dados:
             result.append(data)
@@ -71,6 +71,7 @@ class GetPrecoTaxa(Resource):
     @cross_origin()
     def get(self):
         tesouro_type = request.args.get('tesouro_type')
+        data_vencimento = request.args.get('data_vencimento')
         
         if tesouro_type == "1":
             argumento = "Tesouro IGPM+ com Juros Semestrais"
@@ -86,13 +87,17 @@ class GetPrecoTaxa(Resource):
             argumento = "Tesouro Prefixado"
         else: 
             argumento = "Tesouro Selic"
+            
         print(tesouro_type, argumento)
 
         URI = "mongodb://localhost:27017/"
         client = MongoClient(URI)
         db = client["tfg-database"]
         collection = db["precoTaxa"]
-        dados = collection.find({"Tipo Titulo" : argumento })
+        if(data_vencimento):
+            dados = collection.find({"Tipo Titulo" : argumento, "Data Vencimento": data_vencimento })
+        else:
+            dados = collection.find({"Tipo Titulo" : argumento})
         result = []
         for data in dados:
             result.append(data)

@@ -1,1 +1,5 @@
 /ambvir
+/__pycache__
+/resources/__pycache__/usuarios.cpython-311.pyc
+/user/__pycache__
+*.pyc

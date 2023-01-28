@@ -69,7 +69,10 @@ class SignOut(Resource):
     @cross_origin()
     def get(self):
         session.clear()
-        return jsonify({"message": "Usuário deslogado com suceso"})
+        return jsonify({
+            "status": 200,
+            "message": "Usuário deslogado com suceso"
+        })
 
 class CheckIfLogged(Resource):
     @cross_origin()

@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, session
 from passlib.hash import pbkdf2_sha256
 import uuid
-from app import db
+from web.app import db
 
 class User:
 

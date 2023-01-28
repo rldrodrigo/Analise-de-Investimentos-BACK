@@ -53,7 +53,8 @@ class GetTesouro(Resource):
         else: 
             argumento = "Tesouro Selic"
 
-        URI = "mongodb://localhost:27017/"
+        # URI = "mongodb://localhost:27017/"
+        URI = "mongodb://db:27017"
         client = MongoClient(URI)
         db = client["tfg-database"]
         collection = db["vendaTesouros"]
@@ -90,7 +91,8 @@ class GetPrecoTaxa(Resource):
             
         print(tesouro_type, argumento)
 
-        URI = "mongodb://localhost:27017/"
+        # URI = "mongodb://localhost:27017/"
+        URI = "mongodb://db:27017"
         client = MongoClient(URI)
         db = client["tfg-database"]
         collection = db["precoTaxa"]

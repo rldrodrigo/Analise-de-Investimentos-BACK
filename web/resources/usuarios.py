@@ -5,6 +5,13 @@ import uuid
 from passlib.hash import pbkdf2_sha256
 from pymongo import MongoClient
 
+# Configuração da conexão com o banco
+# URI = "mongodb://localhost:27017/"
+URI = "mongodb://db:27017"
+client = MongoClient(URI)
+db = client["tfg-database"]
+users = db["users"]
+
 def start_session(user):
         del user['password']
         session['logged_in'] = True
@@ -17,29 +24,23 @@ class SignUp(Resource):
     @cross_origin()
     def post(self):
 
-        data = request.get_json()
+        postedData = request.get_json()
 
         user = {
             "_id": uuid.uuid4().hex,
-            "name": data['name'],
-            "email": data['email'],
-            "password": data['password']
+            "name": postedData['name'],
+            "email": postedData['email'],
+            "password": postedData['password']
         }
 
         # Encriptar a senha
         user['password'] = pbkdf2_sha256.encrypt(user['password'])
 
-        # Configuração da conexão com o banco
-        URI = "mongodb://localhost:27017/"
-        client = MongoClient(URI)
-        db = client["tfg-database"]
-        collection = db["users"]
-
         # Verifica se o email já está cadastrado
-        if collection.find_one({ "email" : user['email']}):
+        if users.find_one({ "email" : user['email']}):
             return jsonify({ "error": "Email já está sendo utilizado "}), 400
 
-        if collection.insert_one(user):
+        if users.insert_one(user):
             return start_session(user)
 
         return jsonify({ "error": "Não foi possível cadastrar "}), 400
@@ -48,22 +49,19 @@ class SignIn(Resource):
 
     @cross_origin()
     def post(self):
-        data = request.get_json()
+        postedData = request.get_json()
 
-        # Configuração da conexão com o banco
-        URI = "mongodb://localhost:27017/"
-        client = MongoClient(URI)
-        db = client["tfg-database"]
-        collection = db["users"]
-
-        user = collection.find_one({
-            "email": data['email']
+        user = users.find_one({
+            "email": postedData['email']
         })
 
-        if user and pbkdf2_sha256.verify(data['password'], user['password']):
+        if user and pbkdf2_sha256.verify(postedData['password'], user['password']):
             return start_session(user)
         
-        return jsonify({ "error" : "Credenciais inválidas" })
+        return jsonify({
+            "status": 301,
+            "error" : "Credenciais inválidas" 
+        })
 
         
 

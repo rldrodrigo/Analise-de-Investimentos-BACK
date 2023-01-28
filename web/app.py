@@ -12,6 +12,11 @@ app = Flask(__name__)
 api = Api(app)
 cors = CORS(app)
 
+# Utilizar o URI para quando estiver roando localmente e não pelo docker
+# URI = "mongodb://localhost:27017/"
+URI = "mongodb://db:27017"
+client = MongoClient(URI)
+
 # Definir a secret key do app
 app.secret_key = b'\xe2\xaf\xbc:\xdd'
 
@@ -33,8 +38,6 @@ api.add_resource(SignOut, '/user/signout')
 api.add_resource(CheckIfLogged, '/user/checkLogged')
 
 def PopularBanco():
-    URI = "mongodb://localhost:27017/"
-    client = MongoClient(URI)
     db = client["tfg-database"]
     db["vendaTesouros"].drop()
     
@@ -55,4 +58,4 @@ def PopularBanco():
 
 if __name__ == '__main__':
     PopularBanco()
-    app.run(debug=True)
+    app.run(host='0.0.0.0')

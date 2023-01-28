@@ -38,7 +38,7 @@ class SignUp(Resource):
 
         # Verifica se o email já está cadastrado
         if users.find_one({ "email" : user['email']}):
-            return jsonify({ "error": "Email já está sendo utilizado "}), 400
+            return jsonify({ "error": "Email já está sendo utilizado "}), 301
 
         if users.insert_one(user):
             return start_session(user)
@@ -61,7 +61,7 @@ class SignIn(Resource):
         return jsonify({
             "status": 301,
             "error" : "Credenciais inválidas" 
-        })
+        }), 301
 
         
 
@@ -72,12 +72,12 @@ class SignOut(Resource):
         return jsonify({
             "status": 200,
             "message": "Usuário deslogado com suceso"
-        })
+        }), 200
 
 class CheckIfLogged(Resource):
     @cross_origin()
     def get(self):
         if( 'logged_in' in session):
-            return  jsonify(session)
+            return  jsonify(session), 200
         else:
-            return jsonify(session)
+            return jsonify(session), 200

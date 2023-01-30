@@ -4,9 +4,11 @@ from click import argument
 from flask_restful import Resource, reqparse
 from flask_cors import cross_origin
 import pandas as pd
+import pymongo
 from pymongo import MongoClient
 import json
 from bson import json_util
+from datetime import datetime
 
 class VendasTesouroDireto(Resource):
     @cross_origin()
@@ -35,33 +37,39 @@ class OperacoesTesouroDireto(Resource):
 class GetTesouro(Resource):
     @cross_origin()
     def get(self):
-        tesouro_type = request.args.get('tesouro_type')
-        data_vencimento = request.args.get('data_vencimento')
-        
-        if tesouro_type == "1":
-            argumento = "Tesouro IGPM+ com Juros Semestrais"
-        elif tesouro_type == "2":
-            argumento = "Tesouro Selic"
-        elif tesouro_type == "3":
-            argumento = "Tesouro IPCA+"
-        elif tesouro_type == "4":
-            argumento = "Tesouro IPCA+ com Juros Semestrais"
-        elif tesouro_type == "5":
-            argumento = "Tesouro Prefixado com Juros Semestrais"
-        elif tesouro_type == "6":
-            argumento = "Tesouro Prefixado"
-        else: 
-            argumento = "Tesouro Selic"
+        tipo_titulo = request.args.get('tipo_titulo')
+        ano_vencimento = request.args.get('ano_vencimento')
+        data_inicial = request.args.get('data_inicial')
+        data_final = request.args.get('data_final')
 
-        # URI = "mongodb://localhost:27017/"
-        URI = "mongodb://db:27017"
+        nova_data_inicial = data_inicial.split('-')
+        nova_data_final = data_final.split('-')
+
+        nova_data_inicial = datetime(int(nova_data_inicial[2]), int(nova_data_inicial[1]), int(nova_data_inicial[0]))
+        nova_data_final = datetime(int(nova_data_final[2]), int(nova_data_final[1]), int(nova_data_final[0]))
+
+        URI = "mongodb://localhost:27017/"
+        # URI = "mongodb://db:27017"
         client = MongoClient(URI)
         db = client["tfg-database"]
         collection = db["vendaTesouros"]
-        if(data_vencimento):
-            dados = collection.find({"Tipo Titulo" : argumento, "Vencimento do Titulo": data_vencimento })
+        if(ano_vencimento):
+            dados = collection.find({
+                "tipo_titulo" : tipo_titulo,
+                "ano_vencimento": int(ano_vencimento),
+                "data_venda": {
+                    "$gte": nova_data_inicial,
+                    "$lte": nova_data_final
+                }
+            }).sort( [("data_venda", pymongo.ASCENDING)] )
         else:
-             dados = collection.find({"Tipo Titulo" : argumento})
+             dados = collection.find({
+                "tipo_titulo": tipo_titulo,
+                "data_venda": {
+                    "$gte": nova_data_inicial,
+                    "$lte": nova_data_final
+                }
+            }).sort( [("data_venda", pymongo.ASCENDING)] )
         result = []
         for data in dados:
             result.append(data)
@@ -71,35 +79,39 @@ class GetTesouro(Resource):
 class GetPrecoTaxa(Resource):
     @cross_origin()
     def get(self):
-        tesouro_type = request.args.get('tesouro_type')
-        data_vencimento = request.args.get('data_vencimento')
-        
-        if tesouro_type == "1":
-            argumento = "Tesouro IGPM+ com Juros Semestrais"
-        elif tesouro_type == "2":
-            argumento = "Tesouro Selic"
-        elif tesouro_type == "3":
-            argumento = "Tesouro IPCA+"
-        elif tesouro_type == "4":
-            argumento = "Tesouro IPCA+ com Juros Semestrais"
-        elif tesouro_type == "5":
-            argumento = "Tesouro Prefixado com Juros Semestrais"
-        elif tesouro_type == "6":
-            argumento = "Tesouro Prefixado"
-        else: 
-            argumento = "Tesouro Selic"
-            
-        print(tesouro_type, argumento)
+        tipo_titulo = request.args.get('tipo_titulo')
+        ano_vencimento = request.args.get('ano_vencimento')
+        data_inicial = request.args.get('data_inicial')
+        data_final = request.args.get('data_final')
 
-        # URI = "mongodb://localhost:27017/"
-        URI = "mongodb://db:27017"
+        nova_data_inicial = data_inicial.split('-')
+        nova_data_final = data_final.split('-')
+
+        nova_data_inicial = datetime(int(nova_data_inicial[2]), int(nova_data_inicial[1]), int(nova_data_inicial[0]))
+        nova_data_final = datetime(int(nova_data_final[2]), int(nova_data_final[1]), int(nova_data_final[0]))
+
+        URI = "mongodb://localhost:27017/"
+        # URI = "mongodb://db:27017"
         client = MongoClient(URI)
         db = client["tfg-database"]
         collection = db["precoTaxa"]
-        if(data_vencimento):
-            dados = collection.find({"Tipo Titulo" : argumento, "Data Vencimento": data_vencimento })
+        if(ano_vencimento):
+            dados = collection.find({
+                "tipo_titulo" : tipo_titulo,
+                "ano_vencimento": int(ano_vencimento),
+                "data_base": {
+                    "$gte": nova_data_inicial,
+                    "$lte": nova_data_final
+                }
+            }).sort( [("data_base", pymongo.DESCENDING)] )
         else:
-            dados = collection.find({"Tipo Titulo" : argumento})
+            dados = collection.find({
+                "tipo_titulo" : tipo_titulo,
+                "data_base": {
+                    "$gte": nova_data_inicial,
+                    "$lte": nova_data_final
+                }
+            }).sort( [("data_base", pymongo.DESCENDING)] )
         result = []
         for data in dados:
             result.append(data)

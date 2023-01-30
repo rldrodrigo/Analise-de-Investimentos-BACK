@@ -78,4 +78,8 @@ class CheckIfLogged(Resource):
         if( 'logged_in' in session):
             return  jsonify(session), 200
         else:
-            return jsonify(session), 200
+            return jsonify({
+            "status": 302,
+            "logged_in": False,
+            "message": "Usuário não autenticado",
+        }), 302

@@ -6,7 +6,7 @@ import pandas as pd
 import json
 from datetime import datetime
 
-from resources.tesouro import GetPrecoTaxa, GetTesouro, VendasTesouroDireto, PrecoTaxaTesouroDireto, OperacoesTesouroDireto
+from resources.tesouro import GetPrecoTaxa, GetTesouro, GetAnoVencimento, VendasTesouroDireto, PrecoTaxaTesouroDireto, OperacoesTesouroDireto
 from resources.usuarios import SignIn, SignUp, SignOut, CheckIfLogged
 
 app = Flask(__name__)
@@ -14,8 +14,8 @@ api = Api(app)
 cors = CORS(app)
 
 # Utilizar o URI para quando estiver roando localmente e não pelo docker
-# URI = "mongodb://localhost:27017/"
-URI = "mongodb://db:27017"
+URI = "mongodb://localhost:27017/"
+# URI = "mongodb://db:27017"
 client = MongoClient(URI)
 
 # Definir a secret key do app
@@ -31,6 +31,7 @@ api.add_resource(OperacoesTesouroDireto, '/operacoesTesouroDireto/')
 # Rotas de dados filtrados
 api.add_resource(GetTesouro, '/getTesouro')
 api.add_resource(GetPrecoTaxa, '/getPrecoTaxa')
+api.add_resource(GetAnoVencimento, '/getAnoVencimento')
 
 # Rotas de users
 api.add_resource(SignIn, '/user/login')
@@ -95,4 +96,4 @@ def PopularBanco():
 
 if __name__ == '__main__':
     PopularBanco()
-    app.run(debug=True, host='0.0.0.0')
+    app.run(host='0.0.0.0')

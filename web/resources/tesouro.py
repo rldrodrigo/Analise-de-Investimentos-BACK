@@ -48,8 +48,8 @@ class GetTesouro(Resource):
         nova_data_inicial = datetime(int(nova_data_inicial[2]), int(nova_data_inicial[1]), int(nova_data_inicial[0]))
         nova_data_final = datetime(int(nova_data_final[2]), int(nova_data_final[1]), int(nova_data_final[0]))
 
-        URI = "mongodb://localhost:27017/"
-        # URI = "mongodb://db:27017"
+        # URI = "mongodb://localhost:27017/"
+        URI = "mongodb://db:27017"
         client = MongoClient(URI)
         db = client["tfg-database"]
         collection = db["vendaTesouros"]
@@ -90,8 +90,8 @@ class GetPrecoTaxa(Resource):
         nova_data_inicial = datetime(int(nova_data_inicial[2]), int(nova_data_inicial[1]), int(nova_data_inicial[0]))
         nova_data_final = datetime(int(nova_data_final[2]), int(nova_data_final[1]), int(nova_data_final[0]))
 
-        URI = "mongodb://localhost:27017/"
-        # URI = "mongodb://db:27017"
+        # URI = "mongodb://localhost:27017/"
+        URI = "mongodb://db:27017"
         client = MongoClient(URI)
         db = client["tfg-database"]
         collection = db["precoTaxa"]

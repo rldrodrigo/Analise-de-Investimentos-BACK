@@ -14,8 +14,8 @@ api = Api(app)
 cors = CORS(app)
 
 # Utilizar o URI para quando estiver roando localmente e não pelo docker
-URI = "mongodb://localhost:27017/"
-# URI = "mongodb://db:27017"
+# URI = "mongodb://localhost:27017/"
+URI = "mongodb://db:27017"
 client = MongoClient(URI)
 
 # Definir a secret key do app

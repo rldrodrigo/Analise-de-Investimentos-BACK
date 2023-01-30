@@ -6,8 +6,8 @@ from passlib.hash import pbkdf2_sha256
 from pymongo import MongoClient
 
 # Configuração da conexão com o banco
-URI = "mongodb://localhost:27017/"
-# URI = "mongodb://db:27017"
+# URI = "mongodb://localhost:27017/"
+URI = "mongodb://db:27017"
 client = MongoClient(URI)
 db = client["tfg-database"]
 users = db["users"]

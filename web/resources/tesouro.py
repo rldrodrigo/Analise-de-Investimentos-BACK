@@ -78,7 +78,7 @@ class GetPrecoTaxa(Resource):
                     "$gte": nova_data_inicial,
                     "$lte": nova_data_final
                 }
-            }).sort( [("data_base", pymongo.DESCENDING)] )
+            }).sort( [("data_base", pymongo.ASCENDING)] )
         else:
             dados = collection.find({
                 "tipo_titulo" : tipo_titulo,
@@ -86,7 +86,7 @@ class GetPrecoTaxa(Resource):
                     "$gte": nova_data_inicial,
                     "$lte": nova_data_final
                 }
-            }).sort( [("data_base", pymongo.DESCENDING)] )
+            }).sort( [("data_base", pymongo.ASCENDING)] )
         result = []
         for data in dados:
             result.append(data)

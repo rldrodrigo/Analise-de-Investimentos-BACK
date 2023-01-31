@@ -15,11 +15,12 @@ URI = "mongodb://db:27017"
 client = MongoClient(URI)
 class GetTesouro(Resource):
     @cross_origin()
-    def get(self):
-        tipo_titulo = request.args.get('tipo_titulo')
-        ano_vencimento = request.args.get('ano_vencimento')
-        data_inicial = request.args.get('data_inicial')
-        data_final = request.args.get('data_final')
+    def post(self):
+        postedData = request.get_json()
+        tipo_titulo = postedData['tipo_titulo']
+        ano_vencimento = postedData['ano_vencimento']
+        data_inicial = postedData['data_inicial']
+        data_final = postedData['data_final']
 
         nova_data_inicial = data_inicial.split('-')
         nova_data_final = data_final.split('-')
@@ -54,11 +55,12 @@ class GetTesouro(Resource):
 
 class GetPrecoTaxa(Resource):
     @cross_origin()
-    def get(self):
-        tipo_titulo = request.args.get('tipo_titulo')
-        ano_vencimento = request.args.get('ano_vencimento')
-        data_inicial = request.args.get('data_inicial')
-        data_final = request.args.get('data_final')
+    def post(self):
+        postedData = request.get_json()
+        tipo_titulo = postedData['tipo_titulo']
+        ano_vencimento = postedData['ano_vencimento']
+        data_inicial = postedData['data_inicial']
+        data_final = postedData['data_final']
 
         nova_data_inicial = data_inicial.split('-')
         nova_data_final = data_final.split('-')
@@ -93,8 +95,11 @@ class GetPrecoTaxa(Resource):
 
 class GetAnoVencimento(Resource):
     @cross_origin()
-    def get(self):
-        tipo_titulo = request.args.get('tipo_titulo')
+    def post(self):
+
+        postedData = request.get_json()
+
+        tipo_titulo =  postedData['tipo_titulo']
         print(tipo_titulo)
 
         db = client["tfg-database"]

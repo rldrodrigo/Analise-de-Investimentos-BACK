@@ -4,6 +4,7 @@ from flask_cors import CORS
 from pymongo import MongoClient
 import pandas as pd
 import json
+import math
 from datetime import datetime
 
 from resources.tesouro import GetPrecoTaxa, GetTesouro, GetAnoVencimento, VendasTesouroDireto, PrecoTaxaTesouroDireto, OperacoesTesouroDireto
@@ -47,7 +48,7 @@ def PopularBanco():
     df = pd.read_csv(VendasTesouroDiretoUrl, sep=';', decimal=',')
     data = df.to_json(orient="records")
     data = json.loads(data)
-    # db["vendaTesouros"].insert_many(data)
+    Yi = 1
     for item in data:
         newDataVencimento = item['Vencimento do Titulo'].split('/')
         newDataVenda = item['Data Venda'].split('/')
@@ -62,8 +63,13 @@ def PopularBanco():
             'data_venda': data_venda,
             'PU': item['PU'],
             'quantidade': item['Quantidade'],
-            'valor': item['Valor']
+            'valor': item['Valor'],
+            'taxa_retorno': (item['PU'] - Yi)/Yi,
+            # 'taxa_retorno': round((item['PU'] - Yi)/Yi*100, 2),
+            'taxa_retorno_logaritmica':  math.log(item['PU']/Yi),
+            # 'taxa_retorno_logaritmica':  round(math.log(item['PU']/Yi)*100, 2),
         }
+        Yi = item['PU']
         db["vendaTesouros"].insert_one(newItem)
 
     db["precoTaxa"].drop()
@@ -71,7 +77,6 @@ def PopularBanco():
     df2 = pd.read_csv(PrecoTaxaTesouroDiretoUrl, sep=';', decimal=',')
     tesouros = df2.to_json(orient="records")
     data = json.loads(tesouros)
-    # db["precoTaxa"].insert_many(data)
     
     for item in data:
         newDataVencimento = item['Data Vencimento'].split('/')

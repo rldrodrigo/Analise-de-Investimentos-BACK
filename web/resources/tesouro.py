@@ -13,6 +13,7 @@ from datetime import datetime
 # URI = "mongodb://localhost:27017/"
 URI = "mongodb://db:27017"
 client = MongoClient(URI)
+db = client["tfg-database"]
 class GetTesouro(Resource):
     @cross_origin()
     def post(self):
@@ -27,8 +28,6 @@ class GetTesouro(Resource):
 
         nova_data_inicial = datetime(int(nova_data_inicial[2]), int(nova_data_inicial[1]), int(nova_data_inicial[0]))
         nova_data_final = datetime(int(nova_data_final[2]), int(nova_data_final[1]), int(nova_data_final[0]))
-
-        db = client["tfg-database"]
         collection = db["vendaTesouros"]
         if(ano_vencimento):
             dados = collection.find({
@@ -52,7 +51,6 @@ class GetTesouro(Resource):
             result.append(data)
         return json.loads(json_util.dumps(result))
 
-
 class GetPrecoTaxa(Resource):
     @cross_origin()
     def post(self):
@@ -67,8 +65,6 @@ class GetPrecoTaxa(Resource):
 
         nova_data_inicial = datetime(int(nova_data_inicial[2]), int(nova_data_inicial[1]), int(nova_data_inicial[0]))
         nova_data_final = datetime(int(nova_data_final[2]), int(nova_data_final[1]), int(nova_data_final[0]))
-
-        db = client["tfg-database"]
         collection = db["precoTaxa"]
         if(ano_vencimento):
             dados = collection.find({
@@ -92,17 +88,12 @@ class GetPrecoTaxa(Resource):
             result.append(data)
         return json.loads(json_util.dumps(result))
 
-
 class GetAnoVencimento(Resource):
     @cross_origin()
     def post(self):
 
         postedData = request.get_json()
-
         tipo_titulo =  postedData['tipo_titulo']
-        print(tipo_titulo)
-
-        db = client["tfg-database"]
         collection = db["vendaTesouros"]
 
         dados = collection.find({ "tipo_titulo": tipo_titulo }).distinct("ano_vencimento")
@@ -110,7 +101,6 @@ class GetAnoVencimento(Resource):
         for data in dados:
             result.append(data)
         return json.loads(json_util.dumps(result))
-
 
 # Rotas de dados brutos
 class VendasTesouroDireto(Resource):

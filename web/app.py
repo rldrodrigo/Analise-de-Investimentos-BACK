@@ -64,9 +64,9 @@ def PopularBanco():
             'PU': item['PU'],
             'quantidade': item['Quantidade'],
             'valor': item['Valor'],
-            'taxa_retorno': (item['PU'] - Yi)/Yi,
+            # 'taxa_retorno': (item['PU'] - Yi)/Yi,
             # 'taxa_retorno': round((item['PU'] - Yi)/Yi*100, 2),
-            'taxa_retorno_logaritmica':  math.log(item['PU']/Yi),
+            # 'taxa_retorno_logaritmica':  math.log(item['PU']/Yi),
             # 'taxa_retorno_logaritmica':  round(math.log(item['PU']/Yi)*100, 2),
         }
         Yi = item['PU']

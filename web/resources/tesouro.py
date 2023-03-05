@@ -5,6 +5,7 @@ from flask_restful import Resource, reqparse
 from flask_cors import cross_origin
 import pandas as pd
 import pymongo
+import math
 from pymongo import MongoClient
 import json
 from bson import json_util
@@ -29,25 +30,33 @@ class GetTesouro(Resource):
         nova_data_inicial = datetime(int(nova_data_inicial[2]), int(nova_data_inicial[1]), int(nova_data_inicial[0]))
         nova_data_final = datetime(int(nova_data_final[2]), int(nova_data_final[1]), int(nova_data_final[0]))
         collection = db["vendaTesouros"]
-        if(ano_vencimento):
-            dados = collection.find({
-                "tipo_titulo" : tipo_titulo,
-                "ano_vencimento": int(ano_vencimento),
-                "data_venda": {
-                    "$gte": nova_data_inicial,
-                    "$lte": nova_data_final
-                }
-            }).sort( [("data_venda", pymongo.ASCENDING)] )
-        else:
-             dados = collection.find({
-                "tipo_titulo": tipo_titulo,
-                "data_venda": {
-                    "$gte": nova_data_inicial,
-                    "$lte": nova_data_final
-                }
-            }).sort( [("data_venda", pymongo.ASCENDING)] )
+        Yi = 1
+        
+        dados = collection.find({
+            "tipo_titulo" : tipo_titulo,
+            "ano_vencimento": int(ano_vencimento),
+            "data_venda": {
+                "$gte": nova_data_inicial,
+                "$lte": nova_data_final
+            }
+        }).sort( [("data_venda", pymongo.ASCENDING)])
+
         result = []
         for data in dados:
+            newItem = {
+                'tipo_titulo': data['tipo_titulo'],
+                'ano_vencimento': data['ano_vencimento'],
+                'vencimento_titulo': data['vencimento_titulo'],
+                'data_venda': data['data_venda'],
+                'PU': data['PU'],
+                'quantidade': data['quantidade'],
+                'valor': data['valor'],
+                'taxa_retorno': ( data['PU'] - Yi)/Yi,
+                # 'taxa_retorno': round((item['PU'] - Yi)/Yi*100, 2),
+                'taxa_retorno_logaritmica':  math.log( data['PU']/Yi),
+                # 'taxa_retorno_logaritmica':  round(math.log(item['PU']/Yi)*100, 2),
+            }
+            Yi = data['PU']
             result.append(data)
         return json.loads(json_util.dumps(result))
 
@@ -94,6 +103,21 @@ class GetAnoVencimento(Resource):
 
         postedData = request.get_json()
         tipo_titulo =  postedData['tipo_titulo']
+        collection = db["vendaTesouros"]
+
+        dados = collection.find({ "tipo_titulo": tipo_titulo }).distinct("ano_vencimento")
+        result = []
+        for data in dados:
+            result.append(data)
+        return json.loads(json_util.dumps(result))
+    
+class GetTaxaRetorno(Resource):
+    @cross_origin()
+    def post(self):
+
+        postedData = request.get_json()
+        tipo_titulo =  postedData['tipo_titulo']
+        periodo = postedData['periodo']
         collection = db["vendaTesouros"]
 
         dados = collection.find({ "tipo_titulo": tipo_titulo }).distinct("ano_vencimento")

@@ -15,6 +15,7 @@ from datetime import datetime
 URI = "mongodb://db:27017"
 client = MongoClient(URI)
 db = client["tfg-database"]
+@cross_origin()
 class GetTesouro(Resource):
     def post(self):
         postedData = request.get_json()
@@ -59,6 +60,7 @@ class GetTesouro(Resource):
             result.append(newItem)
         return json.loads(json_util.dumps(result))
 
+@cross_origin()
 class GetPrecoTaxa(Resource):
     def post(self):
         postedData = request.get_json()
@@ -95,6 +97,7 @@ class GetPrecoTaxa(Resource):
             result.append(data)
         return json.loads(json_util.dumps(result))
 
+@cross_origin()
 class GetAnoVencimento(Resource):
     def post(self):
 
@@ -108,6 +111,7 @@ class GetAnoVencimento(Resource):
             result.append(data)
         return json.loads(json_util.dumps(result))
     
+@cross_origin()
 class GetTaxaRetorno(Resource):
     def post(self):
 
@@ -123,12 +127,14 @@ class GetTaxaRetorno(Resource):
         return json.loads(json_util.dumps(result))
 
 # Rotas de dados brutos
+@cross_origin()
 class VendasTesouroDireto(Resource):
     def get(self):
         VendasTesouroDiretoUrl = 'https://tesourotransparente.gov.br/ckan/dataset/f0468ecc-ae97-4287-89c2-6d8139fb4343/resource/e5f90e3a-8f8d-4895-9c56-4bb2f7877920/download/VendasTesouroDireto.csv'       
         df = pd.read_csv(VendasTesouroDiretoUrl, sep=';', decimal=',')
         return df.to_json(orient="records")
 
+@cross_origin()
 class PrecoTaxaTesouroDireto(Resource):
     def get(self):
         PrecoTaxaTesouroDiretoUrl = 'https://www.tesourotransparente.gov.br/ckan/dataset/df56aa42-484a-4a59-8184-7676580c81e3/resource/796d2059-14e9-44e3-80c9-2d9e30b405c1/download/PrecoTaxaTesouroDireto.csv'
@@ -136,6 +142,7 @@ class PrecoTaxaTesouroDireto(Resource):
         tesouros = df.to_json(orient="records")
         return tesouros
 
+@cross_origin()
 class OperacoesTesouroDireto(Resource):
     def get(self):
         # Operação muito longa por que a planilha tem 1.6Gb

@@ -16,7 +16,6 @@ URI = "mongodb://db:27017"
 client = MongoClient(URI)
 db = client["tfg-database"]
 class GetTesouro(Resource):
-    @cross_origin()
     def post(self):
         postedData = request.get_json()
         tipo_titulo = postedData['tipo_titulo']
@@ -61,7 +60,6 @@ class GetTesouro(Resource):
         return json.loads(json_util.dumps(result))
 
 class GetPrecoTaxa(Resource):
-    @cross_origin()
     def post(self):
         postedData = request.get_json()
         tipo_titulo = postedData['tipo_titulo']
@@ -98,7 +96,6 @@ class GetPrecoTaxa(Resource):
         return json.loads(json_util.dumps(result))
 
 class GetAnoVencimento(Resource):
-    @cross_origin()
     def post(self):
 
         postedData = request.get_json()
@@ -112,7 +109,6 @@ class GetAnoVencimento(Resource):
         return json.loads(json_util.dumps(result))
     
 class GetTaxaRetorno(Resource):
-    @cross_origin()
     def post(self):
 
         postedData = request.get_json()
@@ -128,14 +124,12 @@ class GetTaxaRetorno(Resource):
 
 # Rotas de dados brutos
 class VendasTesouroDireto(Resource):
-    @cross_origin()
     def get(self):
         VendasTesouroDiretoUrl = 'https://tesourotransparente.gov.br/ckan/dataset/f0468ecc-ae97-4287-89c2-6d8139fb4343/resource/e5f90e3a-8f8d-4895-9c56-4bb2f7877920/download/VendasTesouroDireto.csv'       
         df = pd.read_csv(VendasTesouroDiretoUrl, sep=';', decimal=',')
         return df.to_json(orient="records")
 
 class PrecoTaxaTesouroDireto(Resource):
-    @cross_origin()
     def get(self):
         PrecoTaxaTesouroDiretoUrl = 'https://www.tesourotransparente.gov.br/ckan/dataset/df56aa42-484a-4a59-8184-7676580c81e3/resource/796d2059-14e9-44e3-80c9-2d9e30b405c1/download/PrecoTaxaTesouroDireto.csv'
         df = pd.read_csv(PrecoTaxaTesouroDiretoUrl, sep=';', decimal=',')
@@ -143,7 +137,6 @@ class PrecoTaxaTesouroDireto(Resource):
         return tesouros
 
 class OperacoesTesouroDireto(Resource):
-    @cross_origin()
     def get(self):
         # Operação muito longa por que a planilha tem 1.6Gb
         OperacoesTesouroDiretoUrl = 'https://www.tesourotransparente.gov.br/ckan/dataset/78739a33-4d2f-4e35-88fd-65f1ccbe81c4/resource/4100d614-d1ad-4b62-9435-84f7943e46f3/download/OperacoesTesouroDireto.csv'

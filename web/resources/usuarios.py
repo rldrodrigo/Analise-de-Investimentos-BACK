@@ -16,7 +16,7 @@ def start_session(user):
         del user['password']
         session['logged_in'] = True
         session['user'] = user
-        return {
+        return  jsonify({
                 'statusCode': 200,
                 'headers': {
                     'Access-Control-Allow-Headers': 'Content-Type',
@@ -24,7 +24,7 @@ def start_session(user):
                     'Access-Control-Allow-Methods': '*'
                 },
                 'body':  jsonify(user)
-            }
+            })
 class SignUp(Resource):
 
     @cross_origin()
@@ -44,28 +44,28 @@ class SignUp(Resource):
 
         # Verifica se o email já está cadastrado
         if users.find_one({ "email" : user['email']}):
-            return {
+            return  jsonify({
                 'statusCode': 301,
                 'headers': {
                     'Access-Control-Allow-Headers': 'Content-Type',
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': '*'
                 },
-                'body':  jsonify({ "error": "Email já está sendo utilizado "})
-            }
+                'body': { "error": "Email já está sendo utilizado "}
+            })
 
         if users.insert_one(user):
             return start_session(user)
 
-        return {
+        return  jsonify({
             'statusCode': 400,
             'headers': {
                 'Access-Control-Allow-Headers': 'Content-Type',
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': '*'
             },
-            'body': jsonify({ "error": "Não foi possível cadastrar "})
-        }
+            'body': { "error": "Não foi possível cadastrar "}
+        })
 
 class SignIn(Resource):
 
@@ -80,15 +80,15 @@ class SignIn(Resource):
         if user and pbkdf2_sha256.verify(postedData['password'], user['password']):
             return start_session(user)
         
-        return {
+        return  jsonify({
             'statusCode': 301,
             'headers': {
                 'Access-Control-Allow-Headers': 'Content-Type',
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': '*'
             },
-            'body': jsonify({ "error": "Credenciais inválidas"})
-        }
+            'body':{ "error": "Credenciais inválidas"}
+        })
         
 
 class SignOut(Resource):

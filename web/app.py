@@ -11,8 +11,8 @@ from resources.tesouro import GetPrecoTaxa, GetTesouro, GetAnoVencimento, Vendas
 from resources.usuarios import SignIn, SignUp, SignOut, CheckIfLogged
 
 app = Flask(__name__)
+CORS(app)
 api = Api(app)
-CORS(api)
 
 # Utilizar o URI para quando estiver roando localmente e não pelo docker
 # URI = "mongodb://localhost:27017/"

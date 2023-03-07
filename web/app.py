@@ -1,6 +1,7 @@
 from flask import Flask, session
 from flask_restful import  Api
 from flask_cors import CORS, cross_origin
+from OpenSSL import SSL
 from pymongo import MongoClient
 import pandas as pd
 import json
@@ -11,8 +12,11 @@ from resources.tesouro import GetPrecoTaxa, GetTesouro, GetAnoVencimento, Vendas
 from resources.usuarios import SignIn, SignUp, SignOut, CheckIfLogged
 
 app = Flask(__name__)
-api = Api(app)
+api = Api(app, ssl_context='adhoc')
 CORS(app)
+
+context = SSL.Context(SSL.PROTOCOL_TLSv1_2)
+context.load_cert_chain('server.crt', 'server.key')
 
 # Utilizar o URI para quando estiver roando localmente e não pelo docker
 # URI = "mongodb://localhost:27017/"
@@ -101,4 +105,4 @@ def PopularBanco():
 
 if __name__ == '__main__':
     PopularBanco()
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=5000, ssl_context=context)

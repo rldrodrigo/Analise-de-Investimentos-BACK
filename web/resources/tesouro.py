@@ -57,7 +57,7 @@ class GetTesouro(Resource):
                 # 'taxa_retorno_logaritmica':  round(math.log(item['PU']/Yi)*100, 2),
             }
             Yi = data['PU']
-            result.append(data)
+            result.append(newItem)
         return json.loads(json_util.dumps(result))
 
 class GetPrecoTaxa(Resource):

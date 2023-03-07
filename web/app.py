@@ -12,7 +12,7 @@ from resources.usuarios import SignIn, SignUp, SignOut, CheckIfLogged
 
 app = Flask(__name__)
 api = Api(app)
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+cors = CORS(app, resources={r"/api/*": {"origins": "https://rldrodrigo.github.io/analise-de-investimentos/"}})
 
 # Utilizar o URI para quando estiver roando localmente e não pelo docker
 # URI = "mongodb://localhost:27017/"

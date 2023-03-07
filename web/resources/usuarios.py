@@ -17,8 +17,9 @@ def start_session(user):
         session['logged_in'] = True
         session['user'] = user
         return jsonify(user), 200
-@cross_origin()
 class SignUp(Resource):
+
+    @cross_origin()
     def post(self):
 
         postedData = request.get_json()
@@ -42,9 +43,9 @@ class SignUp(Resource):
 
         return jsonify({ "error": "Não foi possível cadastrar "}), 400
 
-@cross_origin()
 class SignIn(Resource):
 
+    @cross_origin()
     def post(self):
         postedData = request.get_json()
 
@@ -61,17 +62,18 @@ class SignIn(Resource):
         }), 301
 
         
-@cross_origin()
+
 class SignOut(Resource):
-    
+    @cross_origin()
     def get(self):
         session.clear()
         return jsonify({
             "status": 200,
             "message": "Usuário deslogado com suceso"
         }), 200
-@cross_origin()
+
 class CheckIfLogged(Resource):
+    @cross_origin()
     def get(self):
         if( 'logged_in' in session):
             return  jsonify(session), 200

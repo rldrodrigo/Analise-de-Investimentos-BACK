@@ -11,8 +11,8 @@ from resources.tesouro import GetPrecoTaxa, GetTesouro, GetAnoVencimento, Vendas
 from resources.usuarios import SignIn, SignUp, SignOut, CheckIfLogged
 
 app = Flask(__name__)
-CORS(app)
 api = Api(app)
+CORS(app)
 
 # Utilizar o URI para quando estiver roando localmente e não pelo docker
 # URI = "mongodb://localhost:27017/"
@@ -101,4 +101,4 @@ def PopularBanco():
 
 if __name__ == '__main__':
     PopularBanco()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0')

@@ -53,7 +53,7 @@ class GetTesouro(Resource):
                 'valor': data['valor'],
                 'taxa_retorno': ( data['PU'] - Yi)/Yi,
                 # 'taxa_retorno': round((item['PU'] - Yi)/Yi*100, 2),
-                'taxa_retorno_logaritmica':  math.log( data['PU']/Yi),
+                'taxa_retorno_logaritmica':  math.log(data['PU']/Yi),
                 # 'taxa_retorno_logaritmica':  round(math.log(item['PU']/Yi)*100, 2),
             }
             Yi = data['PU']

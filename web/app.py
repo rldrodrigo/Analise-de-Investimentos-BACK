@@ -1,6 +1,6 @@
 from flask import Flask, session
 from flask_restful import  Api
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from pymongo import MongoClient
 import pandas as pd
 import json
@@ -12,7 +12,7 @@ from resources.usuarios import SignIn, SignUp, SignOut, CheckIfLogged
 
 app = Flask(__name__)
 api = Api(app)
-cors = CORS(app, resources={r"/*":{"origins":"*"}})
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Utilizar o URI para quando estiver roando localmente e não pelo docker
 # URI = "mongodb://localhost:27017/"
@@ -23,22 +23,22 @@ client = MongoClient(URI)
 app.secret_key = b'\xe2\xaf\xbc:\xdd'
 
 # rotas de dados brutos dos tesouros, serão utilizadas para popular o mongodb
-api.add_resource(VendasTesouroDireto, '/vendasTesouroDireto/')
-api.add_resource(PrecoTaxaTesouroDireto, '/precoTaxaTesouroDireto/')
+api.add_resource(VendasTesouroDireto, '/api/vendasTesouroDireto/')
+api.add_resource(PrecoTaxaTesouroDireto, '/api/precoTaxaTesouroDireto/')
 #essa rota possui um alto volume de dados 1.6 Gb
-api.add_resource(OperacoesTesouroDireto, '/operacoesTesouroDireto/')
+api.add_resource(OperacoesTesouroDireto, '/api/operacoesTesouroDireto/')
 
 
 # Rotas de dados filtrados
-api.add_resource(GetTesouro, '/getTesouro')
-api.add_resource(GetPrecoTaxa, '/getPrecoTaxa')
-api.add_resource(GetAnoVencimento, '/getAnoVencimento')
+api.add_resource(GetTesouro, '/api/tesouro/getTesouro')
+api.add_resource(GetPrecoTaxa, '/api/tesouro/getPrecoTaxa')
+api.add_resource(GetAnoVencimento, '/api/tesouro/getAnoVencimento')
 
 # Rotas de users
-api.add_resource(SignIn, '/user/login')
-api.add_resource(SignUp, '/user/signup')
-api.add_resource(SignOut, '/user/signout')
-api.add_resource(CheckIfLogged, '/user/checkLogged')
+api.add_resource(SignIn, '/api/user/login')
+api.add_resource(SignUp, '/api/user/signup')
+api.add_resource(SignOut, '/api/user/signout')
+api.add_resource(CheckIfLogged, '/api/user/checkLogged')
 
 def PopularBanco():
     db = client["tfg-database"]

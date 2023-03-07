@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request, session
-from flask_cors import cross_origin
+from flask_cors import CORS, cross_origin
 from flask_restful import Resource
 import uuid
 from passlib.hash import pbkdf2_sha256

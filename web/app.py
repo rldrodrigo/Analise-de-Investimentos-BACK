@@ -22,10 +22,10 @@ client = MongoClient(URI)
 app.secret_key = b'\xe2\xaf\xbc:\xdd'
 
 # rotas de dados brutos dos tesouros, serão utilizadas para popular o mongodb
-api.add_resource(VendasTesouroDireto, '/api/vendasTesouroDireto/')
-api.add_resource(PrecoTaxaTesouroDireto, '/api/precoTaxaTesouroDireto/')
-#essa rota possui um alto volume de dados 1.6 Gb
-api.add_resource(OperacoesTesouroDireto, '/api/operacoesTesouroDireto/')
+# api.add_resource(VendasTesouroDireto, '/api/vendasTesouroDireto/')
+# api.add_resource(PrecoTaxaTesouroDireto, '/api/precoTaxaTesouroDireto/')
+# #essa rota possui um alto volume de dados 1.6 Gb
+# api.add_resource(OperacoesTesouroDireto, '/api/operacoesTesouroDireto/')
 
 
 # Rotas de dados filtrados
@@ -100,4 +100,4 @@ def PopularBanco():
 
 if __name__ == '__main__':
     PopularBanco()
-    app.run(ssl_context='adhoc', host='0.0.0.0')
+    app.run(host='0.0.0.0')

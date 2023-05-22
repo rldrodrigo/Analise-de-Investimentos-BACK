@@ -9,3 +9,8 @@ services:
       - db
   db:
     build: ./db
+  front:
+    image: analise-ativos
+    build: ../analise-de-investimentos
+    ports:
+      - "80:80"

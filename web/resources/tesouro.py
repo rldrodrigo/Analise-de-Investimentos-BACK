@@ -10,11 +10,23 @@ from pymongo import MongoClient
 import json
 from bson import json_util
 from datetime import datetime
+import random
 
 # URI = "mongodb://localhost:27017/"
 URI = "mongodb://db:27017"
 client = MongoClient(URI)
 db = client["tfg-database"]
+
+def calcular_risco(S, p):
+    n = len(S)
+    if len(S) != len(p):
+        raise ValueError("As listas S e p devem ter o mesmo tamanho")
+    media = sum(S) / n
+    soma_diferencas_quadrado = sum([(S[i] - media) ** 2 * p[i] for i in range(n)])
+    risco = math.sqrt(soma_diferencas_quadrado)
+
+    return risco
+
 class GetTesouro(Resource):
     @cross_origin()
     def post(self):
@@ -31,6 +43,10 @@ class GetTesouro(Resource):
         nova_data_final = datetime(int(nova_data_final[2]), int(nova_data_final[1]), int(nova_data_final[0]))
         collection = db["vendaTesouros"]
         Yi = 1
+        listaRetornos = []
+        pk = []
+        nc = 1.65
+        # nc é o nível de confiança NC(95%) = 1,65; NC (97,5%) = 1,96; NC (90%) = 1,28).
         
         dados = collection.find({
             "tipo_titulo" : tipo_titulo,
@@ -43,6 +59,9 @@ class GetTesouro(Resource):
 
         result = []
         for data in dados:
+            listaRetornos.append(Yi)
+            pk.append(round(random.random(), 2))
+            risco = calcular_risco(listaRetornos, pk)
             newItem = {
                 'tipo_titulo': data['tipo_titulo'],
                 'ano_vencimento': data['ano_vencimento'],
@@ -54,6 +73,8 @@ class GetTesouro(Resource):
                 'taxa_retorno': ( data['PU'] - Yi)/Yi,
                 # 'taxa_retorno': round((item['PU'] - Yi)/Yi*100, 2),
                 'taxa_retorno_logaritmica':  math.log(data['PU']/Yi),
+                'risco': risco,
+                'value_at_risk': -data['PU']*nc*risco
                 # 'taxa_retorno_logaritmica':  round(math.log(item['PU']/Yi)*100, 2),
             }
             Yi = data['PU']

@@ -19,10 +19,8 @@ db = client["tfg-database"]
 
 def calcular_risco(S, p):
     n = len(S)
-    if len(S) != len(p):
-        raise ValueError("As listas S e p devem ter o mesmo tamanho")
     media = sum(S) / n
-    soma_diferencas_quadrado = sum([(S[i] - media) ** 2 * p[i] for i in range(n)])
+    soma_diferencas_quadrado = sum([(S[i] - media) ** 2 * p for i in range(n)])
     risco = math.sqrt(soma_diferencas_quadrado)
 
     return risco
@@ -44,7 +42,7 @@ class GetTesouro(Resource):
         collection = db["vendaTesouros"]
         Yi = 1
         listaRetornos = []
-        pk = []
+        pk = 1
         nc = 1.65
         # nc é o nível de confiança NC(95%) = 1,65; NC (97,5%) = 1,96; NC (90%) = 1,28).
         
@@ -60,7 +58,6 @@ class GetTesouro(Resource):
         result = []
         for data in dados:
             listaRetornos.append(Yi)
-            pk.append(round(random.random(), 2))
             risco = calcular_risco(listaRetornos, pk)
             newItem = {
                 'tipo_titulo': data['tipo_titulo'],
@@ -74,7 +71,8 @@ class GetTesouro(Resource):
                 # 'taxa_retorno': round((item['PU'] - Yi)/Yi*100, 2),
                 'taxa_retorno_logaritmica':  math.log(data['PU']/Yi),
                 'risco': risco,
-                'value_at_risk': -pk[0]*nc*risco
+                'value_at_risk': -1000*nc*risco
+                # Utilizando investimento de 1000 como base, depois alterar para ser possível o usuário digitar
                 # 'taxa_retorno_logaritmica':  round(math.log(item['PU']/Yi)*100, 2),
             }
             Yi = data['PU']
@@ -89,6 +87,12 @@ class GetPrecoTaxa(Resource):
         ano_vencimento = postedData['ano_vencimento']
         data_inicial = postedData['data_inicial']
         data_final = postedData['data_final']
+
+        Yi = 1
+        listaRetornos = []
+        pk = 1
+        nc = 1.65
+        # nc é o nível de confiança NC(95%) = 1,65; NC (97,5%) = 1,96; NC (90%) = 1,28).
 
         nova_data_inicial = data_inicial.split('-')
         nova_data_final = data_final.split('-')
@@ -115,7 +119,29 @@ class GetPrecoTaxa(Resource):
             }).sort( [("data_base", pymongo.ASCENDING)] )
         result = []
         for data in dados:
-            result.append(data)
+            listaRetornos.append(Yi)
+            risco = calcular_risco(listaRetornos, pk)
+            newItem = {
+                'tipo_titulo': data['tipo_titulo'],
+                'ano_vencimento': data['ano_vencimento'],
+                'vencimento_titulo': data['vencimento_titulo'],
+                'data_base': data['data_base'],
+                'pu_base_manha': data['pu_base_manha'],
+                'pu_compra_manha': data['pu_compra_manha'],
+                'pu_venda_manha': data['pu_venda_manha'],
+                'taxa_compra_manha': data['taxa_compra_manha'],
+                'taxa_venda_manha': data['taxa_venda_manha'],
+                'taxa_retorno': ( data['pu_base_manha'] - Yi)/Yi,
+                # 'taxa_retorno': round((item['PU'] - Yi)/Yi*100, 2),
+                'taxa_retorno_logaritmica':  math.log(data['pu_base_manha']/Yi),
+                'risco': 0 if Yi == 1 else risco,
+                'value_at_risk': 0 if Yi == 1 else -1000*nc*risco
+                # Utilizando investimento de 1000 como base, depois alterar para ser possível o usuário digitar
+                # 'taxa_retorno_logaritmica':  round(math.log(item['PU']/Yi)*100, 2),
+            }
+            Yi = data['pu_base_manha']
+            result.append(newItem)
+        
         return json.loads(json_util.dumps(result))
 
 class GetAnoVencimento(Resource):

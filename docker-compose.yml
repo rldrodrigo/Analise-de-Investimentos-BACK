@@ -9,6 +9,8 @@ services:
       - db
   db:
     build: ./db
+    ports:
+      - "27017:27017"
   front:
     image: analise-ativos
     build: ../analise-de-investimentos

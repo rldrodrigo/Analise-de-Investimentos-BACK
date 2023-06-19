@@ -18,12 +18,14 @@ client = MongoClient(URI)
 db = client["tfg-database"]
 
 def calcular_risco(S, p):
+    S = S[1:]
     n = len(S)
-    media = sum(S) / n
-    soma_diferencas_quadrado = sum([(S[i] - media) ** 2 * p for i in range(n)])
-    risco = math.sqrt(soma_diferencas_quadrado)
-
-    return risco
+    if (n > 0):
+        media = sum(S) / n
+        soma_diferencas_quadrado = sum([(S[i] - media) ** 2 * p for i in range(n)])
+        risco = math.sqrt(soma_diferencas_quadrado)
+        return risco
+    return 0
 
 class GetTesouro(Resource):
     @cross_origin()

@@ -11,21 +11,18 @@ import json
 from bson import json_util
 from datetime import datetime
 import random
+import numpy as np
 
 # URI = "mongodb://localhost:27017/"
 URI = "mongodb://db:27017"
 client = MongoClient(URI)
 db = client["tfg-database"]
 
-def calcular_risco(S, p):
-    S = S[1:]
-    n = len(S)
-    if (n > 0):
-        media = sum(S) / n
-        soma_diferencas_quadrado = sum([(S[i] - media) ** 2 * p for i in range(n)])
-        risco = math.sqrt(soma_diferencas_quadrado)
-        return risco
-    return 0
+def calcular_volatilidade(S, media_S):
+    diferenca_media = S - media_S
+    diferenca_quadrada = diferenca_media**2
+    volatilidade = np.sqrt(np.sum(diferenca_quadrada))
+    return volatilidade
 
 class GetTesouro(Resource):
     @cross_origin()
@@ -42,11 +39,6 @@ class GetTesouro(Resource):
         nova_data_inicial = datetime(int(nova_data_inicial[2]), int(nova_data_inicial[1]), int(nova_data_inicial[0]))
         nova_data_final = datetime(int(nova_data_final[2]), int(nova_data_final[1]), int(nova_data_final[0]))
         collection = db["vendaTesouros"]
-        Yi = 1
-        listaRetornos = []
-        pk = 1
-        nc = 1.65
-        # nc é o nível de confiança NC(95%) = 1,65; NC (97,5%) = 1,96; NC (90%) = 1,28).
         
         dados = collection.find({
             "tipo_titulo" : tipo_titulo,
@@ -59,8 +51,6 @@ class GetTesouro(Resource):
 
         result = []
         for data in dados:
-            listaRetornos.append(Yi)
-            risco = calcular_risco(listaRetornos, pk)
             newItem = {
                 'tipo_titulo': data['tipo_titulo'],
                 'ano_vencimento': data['ano_vencimento'],
@@ -69,15 +59,7 @@ class GetTesouro(Resource):
                 'PU': data['PU'],
                 'quantidade': data['quantidade'],
                 'valor': data['valor'],
-                'taxa_retorno': ( data['PU'] - Yi)/Yi,
-                # 'taxa_retorno': round((item['PU'] - Yi)/Yi*100, 2),
-                'taxa_retorno_logaritmica':  math.log(data['PU']/Yi),
-                'risco': risco,
-                'value_at_risk': -1000*nc*risco
-                # Utilizando investimento de 1000 como base, depois alterar para ser possível o usuário digitar
-                # 'taxa_retorno_logaritmica':  round(math.log(item['PU']/Yi)*100, 2),
             }
-            Yi = data['PU']
             result.append(newItem)
         return json.loads(json_util.dumps(result))
 
@@ -121,8 +103,11 @@ class GetPrecoTaxa(Resource):
             }).sort( [("data_base", pymongo.ASCENDING)] )
         result = []
         for data in dados:
-            listaRetornos.append(Yi)
-            risco = calcular_risco(listaRetornos, pk)
+            retorno = 0 if Yi == 1 else ( data['pu_base_manha'] - Yi)/Yi
+            listaRetornos.append(retorno)
+            Si = np.array(listaRetornos)
+            media_S = np.mean(Si)
+            volatilidade = np.sqrt((retorno - media_S)**2)
             newItem = {
                 'tipo_titulo': data['tipo_titulo'],
                 'ano_vencimento': data['ano_vencimento'],
@@ -133,11 +118,11 @@ class GetPrecoTaxa(Resource):
                 'pu_venda_manha': data['pu_venda_manha'],
                 'taxa_compra_manha': data['taxa_compra_manha'],
                 'taxa_venda_manha': data['taxa_venda_manha'],
-                'taxa_retorno': ( data['pu_base_manha'] - Yi)/Yi,
+                'taxa_retorno': retorno,
                 # 'taxa_retorno': round((item['PU'] - Yi)/Yi*100, 2),
                 'taxa_retorno_logaritmica':  math.log(data['pu_base_manha']/Yi),
-                'risco': 0 if Yi == 1 else risco,
-                'value_at_risk': 0 if Yi == 1 else -1000*nc*risco
+                'risco': volatilidade,
+                'value_at_risk': 0 if Yi == 1 else -1000*nc*volatilidade
                 # Utilizando investimento de 1000 como base, depois alterar para ser possível o usuário digitar
                 # 'taxa_retorno_logaritmica':  round(math.log(item['PU']/Yi)*100, 2),
             }
